@@ -30,8 +30,9 @@ export default function Workspace() {
   // Status Polling
   const { data: jobStatus, error: statusError } = useGetJobStatus(currentJobId || '', {
     query: {
+      queryKey: ['jobStatus', currentJobId],
       enabled: !!currentJobId && missionState === 'processing',
-      refetchInterval: 1500
+      refetchInterval: 1500,
     }
   });
 

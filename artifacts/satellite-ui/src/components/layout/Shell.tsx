@@ -5,7 +5,7 @@ import { useHealthCheck } from '@workspace/api-client-react';
 
 export function Shell({ children }: { children: React.ReactNode }) {
   const [location] = useLocation();
-  const { data: health } = useHealthCheck({ query: { refetchInterval: 10000 } });
+  const { data: health } = useHealthCheck({ query: { refetchInterval: 10000, queryKey: ['healthz'] } });
 
   const navItems = [
     { href: '/', label: 'Command Center', icon: Satellite },
