@@ -3,13 +3,21 @@ info:
   # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: ISRO Satellite Frame Interpolation API
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: models
+    description: ML model status
+  - name: inspect
+    description: NetCDF dataset inspection
+  - name: jobs
+    description: Async processing jobs
+  - name: interpolate
+    description: Frame interpolation
 paths:
   /healthz:
     get:
@@ -24,13 +32,462 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  /models/status:
+    get:
+      operationId: getModelStatus
+      tags: [models]
+      summary: ML model status
+      description: Returns model availability, device info, and fallback mode
+      responses:
+        "200":
+          description: Model status
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ModelStatus"
+
+  /inspect:
+    post:
+      operationId: inspectDataset
+      tags: [inspect]
+      summary: Inspect NetCDF dataset
+      description: Accepts a .nc file and returns structured metadata
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/InspectInput"
+      responses:
+        "200":
+          description: Dataset metadata
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DatasetMetadata"
+        "400":
+          description: Invalid file
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /jobs/create:
+    post:
+      operationId: createJob
+      tags: [jobs]
+      summary: Create interpolation job
+      description: Creates a new async processing job
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/JobInput"
+      responses:
+        "200":
+          description: Job created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/JobCreated"
+
+  /jobs/{jobId}/status:
+    get:
+      operationId: getJobStatus
+      tags: [jobs]
+      summary: Get job status
+      description: Returns current progress and stage of a job
+      parameters:
+        - name: jobId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Job status
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/JobStatus"
+        "404":
+          description: Job not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /jobs/{jobId}/result:
+    get:
+      operationId: getJobResult
+      tags: [jobs]
+      summary: Get job result
+      description: Returns interpolated frames, metrics, and explainability info
+      parameters:
+        - name: jobId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Job result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/JobResult"
+        "404":
+          description: Job not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /interpolate:
+    post:
+      operationId: interpolateFrames
+      tags: [interpolate]
+      summary: Run frame interpolation
+      description: Main orchestration endpoint for frame interpolation
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/InterpolateInput"
+      responses:
+        "200":
+          description: Interpolation result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InterpolationResult"
+        "400":
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /outputs/{jobId}/{filename}:
+    get:
+      operationId: getOutputFile
+      tags: [jobs]
+      summary: Get output file
+      description: Returns a preview or output image file
+      parameters:
+        - name: jobId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: filename
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: File content
+          content:
+            image/png:
+              schema:
+                type: string
+                format: binary
+        "404":
+          description: File not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
 components:
   schemas:
     HealthStatus:
       type: object
+      required: [status, version, timestamp, modelAvailable, fallbackMode, backendReady]
       properties:
         status:
           type: string
-      required:
-        - status
+        version:
+          type: string
+        timestamp:
+          type: string
+        modelAvailable:
+          type: boolean
+        fallbackMode:
+          type: boolean
+        backendReady:
+          type: boolean
 
+    ModelStatus:
+      type: object
+      required: [modelExists, modelPath, inferenceReady, fallbackMode, device]
+      properties:
+        modelExists:
+          type: boolean
+        modelPath:
+          type: string
+        inferenceReady:
+          type: boolean
+        fallbackMode:
+          type: boolean
+        device:
+          type: string
+        torchVersion:
+          type: ["string", "null"]
+
+    InspectInput:
+      type: object
+      properties:
+        file:
+          type: string
+          format: binary
+
+    DatasetMetadata:
+      type: object
+      required: [filename, variables, dimensions, coordinates, timeSteps, candidateVariables, explanation]
+      properties:
+        filename:
+          type: string
+        fileSizeBytes:
+          type: integer
+        variables:
+          type: array
+          items:
+            $ref: "#/components/schemas/VariableInfo"
+        dimensions:
+          type: object
+          additionalProperties:
+            type: integer
+        coordinates:
+          type: array
+          items:
+            type: string
+        timeSteps:
+          type: integer
+        hasTimeAxis:
+          type: boolean
+        candidateVariables:
+          type: array
+          items:
+            $ref: "#/components/schemas/CandidateVariable"
+        explanation:
+          type: string
+        globalAttributes:
+          type: object
+          additionalProperties:
+            type: string
+
+    VariableInfo:
+      type: object
+      required: [name, dtype, shape, dims]
+      properties:
+        name:
+          type: string
+        dtype:
+          type: string
+        shape:
+          type: array
+          items:
+            type: integer
+        dims:
+          type: array
+          items:
+            type: string
+        minVal:
+          type: ["number", "null"]
+        maxVal:
+          type: ["number", "null"]
+        nanCount:
+          type: integer
+        units:
+          type: ["string", "null"]
+        longName:
+          type: ["string", "null"]
+
+    CandidateVariable:
+      type: object
+      required: [name, score, reason]
+      properties:
+        name:
+          type: string
+        score:
+          type: number
+        reason:
+          type: string
+
+    JobInput:
+      type: object
+      required: [uploadId, selectedVariable]
+      properties:
+        uploadId:
+          type: string
+        selectedVariable:
+          type: string
+        frameA:
+          type: ["integer", "null"]
+        frameB:
+          type: ["integer", "null"]
+        demoMode:
+          type: boolean
+
+    JobCreated:
+      type: object
+      required: [jobId, status, createdAt]
+      properties:
+        jobId:
+          type: string
+        status:
+          type: string
+        createdAt:
+          type: string
+
+    JobStatus:
+      type: object
+      required: [jobId, status, stage, progress, messages]
+      properties:
+        jobId:
+          type: string
+        status:
+          type: string
+        stage:
+          type: string
+        progress:
+          type: number
+        messages:
+          type: array
+          items:
+            type: string
+        error:
+          type: ["string", "null"]
+        completedAt:
+          type: ["string", "null"]
+
+    JobResult:
+      type: object
+      required: [jobId, status, explanation]
+      properties:
+        jobId:
+          type: string
+        status:
+          type: string
+        frameAUrl:
+          type: ["string", "null"]
+        frameBUrl:
+          type: ["string", "null"]
+        interpolatedUrl:
+          type: ["string", "null"]
+        metrics:
+          $ref: "#/components/schemas/ValidationMetrics"
+        explanation:
+          $ref: "#/components/schemas/Explanation"
+        processingTimeMs:
+          type: ["integer", "null"]
+        fallbackMode:
+          type: boolean
+
+    ValidationMetrics:
+      type: object
+      properties:
+        ssim:
+          type: ["number", "null"]
+        psnr:
+          type: ["number", "null"]
+        mae:
+          type: ["number", "null"]
+        rmse:
+          type: ["number", "null"]
+        groundTruthAvailable:
+          type: boolean
+
+    Explanation:
+      type: object
+      required: [steps]
+      properties:
+        selectedVariable:
+          type: ["string", "null"]
+        detectedDimensions:
+          type: array
+          items:
+            type: string
+        normalizationMethod:
+          type: string
+        interpolationMode:
+          type: string
+        fallbackMode:
+          type: boolean
+        confidenceIndicators:
+          type: array
+          items:
+            type: string
+        datasetNotes:
+          type: array
+          items:
+            type: string
+        steps:
+          type: array
+          items:
+            $ref: "#/components/schemas/ExplanationStep"
+
+    ExplanationStep:
+      type: object
+      required: [step, label, description, status]
+      properties:
+        step:
+          type: integer
+        label:
+          type: string
+        description:
+          type: string
+        status:
+          type: string
+
+    InterpolateInput:
+      type: object
+      properties:
+        file:
+          type: string
+          format: binary
+        selectedVariable:
+          type: string
+        frameA:
+          type: string
+        frameB:
+          type: string
+        demoMode:
+          type: string
+
+    InterpolationResult:
+      type: object
+      required: [jobId, status, explanation]
+      properties:
+        jobId:
+          type: string
+        status:
+          type: string
+        frameAUrl:
+          type: ["string", "null"]
+        frameBUrl:
+          type: ["string", "null"]
+        interpolatedUrl:
+          type: ["string", "null"]
+        metrics:
+          $ref: "#/components/schemas/ValidationMetrics"
+        explanation:
+          $ref: "#/components/schemas/Explanation"
+        processingTimeMs:
+          type: ["integer", "null"]
+        fallbackMode:
+          type: boolean
+
+    ErrorResponse:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: string
+        detail:
+          type: ["string", "null"]

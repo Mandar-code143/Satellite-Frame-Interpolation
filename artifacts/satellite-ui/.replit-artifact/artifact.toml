@@ -1,0 +1,31 @@
+kind = "web"
+previewPath = "/"
+title = "ISRO Satellite Frame Interpolation"
+version = "1.0.0"
+id = "artifacts/satellite-ui"
+router = "path"
+
+[[integratedSkills]]
+name = "react-vite"
+version = "1.0.0"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 25251
+
+[services.development]
+run = "pnpm --filter @workspace/satellite-ui run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/satellite-ui", "run", "build" ]
+publicDir = "artifacts/satellite-ui/dist/public"
+serve = "static"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "25251"
+BASE_PATH = "/"

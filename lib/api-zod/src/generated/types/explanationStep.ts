@@ -6,11 +6,9 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export interface HealthStatus {
+export interface ExplanationStep {
+  step: number;
+  label: string;
+  description: string;
   status: string;
-  version: string;
-  timestamp: string;
-  modelAvailable: boolean;
-  fallbackMode: boolean;
-  backendReady: boolean;
 }

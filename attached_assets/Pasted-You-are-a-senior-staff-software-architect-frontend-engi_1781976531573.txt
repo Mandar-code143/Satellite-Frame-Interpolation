@@ -1,0 +1,468 @@
+You are a senior staff software architect, frontend engineer, backend engineer, ML systems engineer, and product designer.
+
+Build a complete full-stack prototype for an ISRO-inspired satellite frame interpolation command center.
+
+This is not a generic dashboard.
+This is not a landing page.
+This is not a mockup-only UI.
+
+The result must be a real, runnable, connected application that:
+1) accepts raw NetCDF satellite files,
+2) inspects the scientific dataset,
+3) preprocesses the data into image frames,
+4) runs a frame interpolation engine,
+5) returns an interpolated intermediate frame,
+6) displays the workflow inside a premium cinematic 3D mission-control interface.
+
+The project must feel like a real scientific product used by a satellite operations team.
+
+PRIMARY PRODUCT GOAL
+Create a deeply polished space-agency-style web application for satellite frame interpolation.
+
+The app must clearly show this pipeline:
+NetCDF file upload
+→ dataset inspection
+→ variable/channel selection
+→ normalization and preprocessing
+→ frame extraction
+→ interpolation inference
+→ validation metrics
+→ final visualization
+→ download/export
+
+The architecture must be clean, modular, and ready for extension.
+
+NON-NEGOTIABLE RULES
+- Generate frontend and backend together in one project.
+- They must already be connected.
+- The project must run locally.
+- No fake-only UI.
+- No hardcoded variable name assumptions such as TIR1.
+- No single-file spaghetti code.
+- No broken imports.
+- No unfinished placeholder buttons.
+- No missing API contracts.
+- No vague model integration.
+- No fake metrics.
+- No fake model behavior.
+- No generic admin template look.
+- No flat design.
+- No weak loading states.
+- No dead-end interaction flows.
+
+TECH STACK
+Frontend:
+- React + Vite
+- TypeScript
+- Tailwind CSS
+- Framer Motion
+- Lucide React
+- A reliable browser-friendly 3D stack if needed, such as react-three-fiber / drei / three.js
+- Use stable, practical 3D implementation that looks premium and works well in-browser
+
+Backend:
+- FastAPI
+- Python 3.11+
+- Uvicorn
+- xarray
+- netCDF4
+- numpy
+- pillow
+- opencv-python
+- torch
+- pydantic
+- python-multipart
+- aiofiles if useful
+- CORS enabled
+
+PRODUCT VISION
+The UI should feel like:
+- mission control for a satellite intelligence team,
+- a futuristic scientific dashboard,
+- a space-agency operations console,
+- a premium data visualization system,
+- a real engineering product.
+
+DESIGN DIRECTION
+The visual style should be:
+- deep black / space background
+- neon cyan, electric blue, violet accents
+- glassmorphism cards
+- soft glow edges
+- orbital motion
+- subtle starfield
+- cinematic layering
+- crisp typography
+- elegant motion
+- premium spacing
+- visually dense but readable
+- highly polished and technically convincing
+
+Add 3D elements that fit the mission:
+- rotating Earth or globe
+- orbiting satellite animation
+- orbital scan arcs
+- depth parallax
+- floating panels
+- scanning beam / telemetry motion
+- subtle motion trails or data streams
+
+The 3D visuals must support the scientific story, not distract from it.
+
+SCIENCE AND PRODUCT CREDIBILITY
+This is not just art.
+The app must make the scientific workflow obvious:
+- dataset inspection
+- variable discovery
+- scientific normalization
+- image frame creation
+- interpolation
+- validation
+- explainability
+
+The judge should immediately understand why NetCDF processing is needed and how the interpolation works.
+
+PROJECT STRUCTURE
+Generate code with a clean modular structure similar to this:
+
+frontend/
+  src/
+    components/
+    pages/
+    hooks/
+    lib/
+    types/
+    styles/
+    assets/
+    App.tsx
+    main.tsx
+
+backend/
+  app/
+    api/
+    core/
+    services/
+    utils/
+    schemas/
+    main.py
+  models/
+  data/
+    uploads/
+    previews/
+    outputs/
+  tests/
+
+If you use a different structure, keep it equally clean and modular.
+
+BACKEND RESPONSIBILITIES
+
+1) Health and system status
+- Create a health endpoint.
+- Create a model status endpoint.
+- Detect whether the ML weights are present.
+- Detect whether the backend is running in fallback mode.
+- Return backend readiness and device info.
+
+2) NetCDF dataset inspection
+- Accept a .nc file.
+- Use xarray to inspect the file.
+- Detect variables, dimensions, coordinates, attributes, time steps, dtype, min/max, and candidate display channels.
+- Do not assume any one variable name.
+- Rank likely visual variables intelligently.
+- Return structured metadata to the frontend.
+- If multiple candidates exist, allow the frontend to choose one.
+- If the file has unusable variables, explain why.
+
+3) Scientific preprocessing
+- Convert selected NetCDF scientific data into image-ready frames.
+- Normalize values into 8-bit image space carefully.
+- Preserve contrast and structure.
+- Support grayscale preview.
+- Optionally support false-color preview if helpful.
+- Save preview images in a dedicated folder.
+- Log preprocessing steps clearly.
+- Handle corrupted files, missing dimensions, NaN/inf values, and invalid arrays gracefully.
+
+4) Frame extraction logic
+- If the dataset contains a time axis, support selecting two time slices or a time window.
+- If only one file is available, support previewing the dataset and selecting two interpretable frames or slices.
+- If the user uploads two preprocessed frames directly, support that too.
+- Keep the interface flexible and robust.
+
+5) ML model adapter
+- Create a model adapter layer separate from routes.
+- The adapter must support a RIFE-family interpolation checkpoint as the default concept.
+- Structure the adapter so that another interpolation model could be swapped in later without changing the frontend or API.
+- Detect CPU/GPU automatically.
+- Load weights from backend/models.
+- If the checkpoint is missing, switch to a safe fallback demo mode that produces a simple blended interpolation so the app still works.
+- Clearly mark fallback mode in the API response and frontend UI.
+- Put explicit comments where the real model weights should be placed.
+- Keep model loading isolated, clean, and replaceable.
+
+6) Async job flow
+- Do not make the app feel frozen during long processing.
+- Use a job-based flow for interpolation.
+- Create a job when processing starts.
+- Return a job ID.
+- Allow polling or live updates for status.
+- Support progress updates such as:
+  - uploading
+  - inspecting
+  - preprocessing
+  - loading model
+  - running inference
+  - generating validation
+  - completed
+- The job system can be lightweight, but it must exist.
+
+7) Progress updates
+- Add WebSocket or Server-Sent Events support if feasible.
+- If real-time streaming is too heavy, provide a clean polling endpoint that updates progress.
+- The UI should show live processing stages, not just a spinner.
+
+8) Validation and scientific trust
+- If a ground-truth midpoint frame is available, compute useful metrics such as:
+  - SSIM
+  - PSNR
+  - MAE
+  - RMSE
+- If ground truth is unavailable, do not fake metrics.
+- Instead, show preprocessing stats, inference mode, and a technical explanation.
+- Add a scientific explainability object that describes what the system did.
+
+9) Explainability payload
+Return a structured explanation such as:
+- selected variable
+- detected dimensions
+- normalization method
+- interpolation mode
+- fallback vs real model
+- available confidence indicators
+- notes about dataset limitations
+
+API CONTRACT
+Generate these endpoints:
+
+GET /health
+- status
+- version
+- timestamp
+- model availability
+- fallback mode
+- backend readiness
+
+GET /api/models/status
+- model file exists or not
+- model path
+- inference readiness
+- fallback mode
+- device info
+
+POST /api/inspect
+- accepts one .nc file
+- returns dataset metadata, candidate variables, dims, coords, and inspection explanation
+
+POST /api/jobs/create
+- creates a processing job
+- accepts upload info and selection info
+- returns job ID and initial status
+
+GET /api/jobs/{job_id}/status
+- returns progress, stage, messages, and completion state
+
+GET /api/jobs/{job_id}/result
+- returns original frame paths, interpolated frame path, metadata, metrics, explanation, and output links
+
+POST /api/interpolate
+- accepted as the main orchestration endpoint if you want a simpler direct path
+- it may internally create and run a job
+- should still return structured output
+- do not make the frontend depend on a fake synchronous completion only
+
+If you implement both job-based and direct orchestration endpoints, keep them consistent.
+
+FRONTEND RESPONSIBILITIES
+The frontend must be a premium scientific operations console.
+
+Create these main areas:
+
+1) Mission dashboard hero
+- dramatic 3D space/globe/satellite visual
+- strong title and subtitle
+- mission status badges
+- prominent action buttons
+- polished motion and depth
+
+2) Dataset inspector
+- upload .nc file
+- call backend inspect endpoint
+- show detected variables, dimensions, coordinates, time info, dtype, min/max
+- allow user to select variable/channel if multiple candidates exist
+- show a clean scientific summary card
+- show why a variable was selected
+
+3) Interpolation workspace
+- show Frame A, interpolated frame, and Frame B
+- side-by-side comparison
+- split view or slider comparison
+- timeline scrubber if time-series data exists
+- play/pause controls
+- visible progress panel
+- job status updates
+- mission log / processing log
+
+4) Scientific validation panel
+- show SSIM, PSNR, MAE, RMSE when available
+- if unavailable, show a clear “ground truth not provided” state
+- explain what is and is not being measured
+
+5) Explainability panel
+- show a step-by-step narrative of what happened:
+  - file loaded
+  - variables detected
+  - variable selected
+  - normalization applied
+  - frame extracted
+  - model loaded or fallback used
+  - interpolation generated
+  - metrics computed
+- this panel should feel like an engineering trace
+
+6) Export panel
+- download the interpolated result
+- view preview assets
+- show output locations
+- show model mode and dataset summary
+
+7) Demo mode
+- include a button to load a bundled demo dataset or sample mode
+- the app must still work even if the user does not have their own file immediately
+- this is critical for demos and hackathons
+
+UI QUALITY REQUIREMENTS
+The UI must be visually exceptional:
+- dark polished background
+- layered glass cards
+- glowing borders
+- premium spacing
+- responsive layout
+- accessible contrast
+- keyboard friendly controls
+- smooth transitions
+- not noisy, but rich and cinematic
+- strong technical presentation
+
+The site should feel like a real mission-control product, not a template.
+
+STATE MANAGEMENT
+Use a clean frontend state system for:
+- idle
+- uploading
+- inspecting
+- ready
+- queued
+- processing
+- success
+- fallback mode
+- error
+
+The UI must show state transitions clearly.
+
+CONNECTIVITY REQUIREMENTS
+The frontend and backend must be wired together properly.
+
+Frontend must:
+- call real APIs
+- send multipart form data correctly
+- handle JSON responses
+- show job progress
+- handle fallback mode
+- show errors clearly
+- retry cleanly
+- render metadata and outputs from the backend
+
+Backend must:
+- enable CORS
+- use predictable JSON schemas
+- save files in stable folders
+- return clear errors
+- support local development cleanly
+
+RELIABILITY AND QUALITY REQUIREMENTS
+Build the code like another engineer will open it tomorrow.
+
+That means:
+- modular design
+- readable naming
+- clean separation of concerns
+- useful comments only where needed
+- no giant god files
+- no broken imports
+- no unfinished references
+- no hidden magic
+- no vague placeholders where real structure is needed
+- no ignored edge cases
+
+DEVELOPER EXPERIENCE REQUIREMENTS
+Generate:
+- package.json
+- requirements.txt
+- .env.example
+- README.md
+- clear local run instructions
+- clear model placement instructions
+- placeholder comments marking where the ML checkpoint should go
+- any helper files needed for a smooth local demo
+
+README must explain:
+- the product goal
+- the NetCDF inspection flow
+- the preprocessing pipeline
+- the interpolation concept
+- the fallback mode
+- how jobs and progress updates work
+- how to run the frontend and backend
+- where to place the model weights
+- how to test with demo data
+
+SECURITY AND FILE SAFETY
+Implement sensible safeguards:
+- validate upload type
+- validate file size if possible
+- reject obviously invalid files
+- prevent path issues
+- clean temporary files if practical
+- avoid unsafe file handling
+- keep uploads in designated folders
+
+IMPLEMENTATION PRIORITY
+1) backend API and schemas
+2) NetCDF inspection
+3) preprocessing utilities
+4) job system and status tracking
+5) model adapter with fallback
+6) frontend shell and premium design system
+7) upload / inspect / job flow
+8) interpolation workspace
+9) validation and explainability panels
+10) 3D visuals and motion polish
+11) README and run instructions
+12) demo dataset support
+
+OUTPUT EXPECTATION
+Generate the full project code with all necessary files and structure.
+Make it runnable.
+Make it beautiful.
+Make it scientifically believable.
+Make it modular and easy to extend.
+Make the frontend and backend visibly connected.
+Make the model integration layer explicit and drop-in ready.
+Make the async progress visible.
+Make the explainability visible.
+Make the demo mode usable.
+
+If something is too heavy for the environment, simplify the implementation while keeping the same architecture and user experience.
+If a dependency cannot be used, choose the nearest stable alternative and preserve the same behavior.
+
+Now generate the complete project.

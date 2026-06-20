@@ -6,11 +6,12 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export interface HealthStatus {
-  status: string;
-  version: string;
-  timestamp: string;
-  modelAvailable: boolean;
+export interface ModelStatus {
+  modelExists: boolean;
+  modelPath: string;
+  inferenceReady: boolean;
   fallbackMode: boolean;
-  backendReady: boolean;
+  device: string;
+  /** @nullable */
+  torchVersion?: string | null;
 }
