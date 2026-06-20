@@ -1,36 +1,51 @@
-# [Project name]
+# ISRO Satellite Frame Interpolation Command Center
 
-_Replace the heading above with the project's name, and this line with one sentence describing what this app does for users._
+A cinematic full-stack mission control app for interpolating missing frames in ISRO satellite NetCDF datasets using ML (RIFE model, fallback blend mode when no weights).
 
 ## Run & Operate
 
-- `pnpm --filter @workspace/api-server run dev` — run the API server (port 5000)
+- Frontend (React+Vite): `pnpm --filter @workspace/satellite-ui run dev`
+- Backend (Python FastAPI): `.pythonlibs/bin/uvicorn backend.app.main:app --host 0.0.0.0 --port 8080 --reload --reload-dir backend`
 - `pnpm run typecheck` — full typecheck across all packages
 - `pnpm run build` — typecheck + build all packages
-- `pnpm --filter @workspace/api-spec run codegen` — regenerate API hooks and Zod schemas from the OpenAPI spec
-- `pnpm --filter @workspace/db run push` — push DB schema changes (dev only)
-- Required env: `DATABASE_URL` — Postgres connection string
+- `pnpm --filter @workspace/api-spec run codegen` — regenerate API hooks and Zod schemas
 
 ## Stack
 
 - pnpm workspaces, Node.js 24, TypeScript 5.9
-- API: Express 5
-- DB: PostgreSQL + Drizzle ORM
-- Validation: Zod (`zod/v4`), `drizzle-zod`
-- API codegen: Orval (from OpenAPI spec)
-- Build: esbuild (CJS bundle)
+- Frontend: React + Vite + Tailwind + Framer Motion + Canvas 2D (animated globe)
+- API: Python FastAPI + uvicorn (run via api-server artifact on port 8080)
+- State: Zustand
+- ML: PyTorch (CPU, fallback blend when no RIFE weights)
+- Science: xarray, NetCDF4, numpy, Pillow, OpenCV, scipy, scikit-image
 
 ## Where things live
 
-_Populate as you build — short repo map plus pointers to the source-of-truth file for DB schema, API contracts, theme files, etc._
+- `artifacts/satellite-ui/` — React+Vite frontend (pages: home, inspect, workspace, results)
+- `artifacts/api-server/` — artifact config only; the actual server is `backend/`
+- `backend/` — Python FastAPI app (workspace root)
+  - `backend/app/main.py` — FastAPI entry point
+  - `backend/app/api/routes/` — health, inspect, jobs, interpolate, outputs
+  - `backend/app/services/` — netcdf_service, preprocessing, model_adapter, job_manager
+  - `backend/models/rife_checkpoint.pth` — drop RIFE weights here to enable ML mode
+- `lib/api-spec/openapi.yaml` — API contract (source of truth)
+- `lib/api-zod/` — generated Zod schemas
+- `lib/api-client-react/` — generated React Query hooks
 
 ## Architecture decisions
 
-_Populate as you build — non-obvious choices a reader couldn't infer from the code (3-5 bullets)._
+- Python FastAPI replaces the Node.js api-server for all `/api/*` routes; the artifact.toml dev run command starts uvicorn directly.
+- `torchvision` is unavailable on this platform — excluded from install; RIFE model uses torch + custom loading only.
+- The 3D globe uses a Canvas 2D animated renderer (no WebGL) because the Replit preview iframe cannot create WebGL contexts.
+- All ML processing falls back to scipy linear blend interpolation when no model checkpoint is present.
+- `--reload-dir backend` on uvicorn prevents the reloader from watching node_modules and frontend build output.
 
 ## Product
 
-_Describe the high-level user-facing capabilities of this app once they exist._
+- Upload NetCDF satellite datasets and inspect variables/metadata
+- Select a variable and run frame interpolation (ML or fallback blend)
+- View async job status and download interpolated output frames
+- Demo mode available without uploading a file
 
 ## User preferences
 
@@ -38,7 +53,11 @@ _Populate as you build — explicit user instructions worth remembering across s
 
 ## Gotchas
 
-_Populate as you build — sharp edges, "always run X before Y" rules._
+- `torchvision` cannot be installed on this platform — do NOT add it.
+- WebGL is unavailable in the Replit preview iframe — use Canvas 2D or CSS for any visual effects.
+- uvicorn must use `--reload-dir backend` to avoid watching the entire workspace (causes thousands of spurious reloads).
+- Model weights go in `backend/models/rife_checkpoint.pth`; without them the app runs in FALLBACK MODE (scipy blend).
+- Python libs installed via uv into `.pythonlibs/`; binary at `.pythonlibs/bin/uvicorn`.
 
 ## Pointers
 

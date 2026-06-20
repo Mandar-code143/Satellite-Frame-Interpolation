@@ -2,27 +2,26 @@ import { Switch, Route, Router as WouterRouter } from "wouter";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { Shell } from "@/components/layout/Shell";
+import Home from "@/pages/home";
+import Inspect from "@/pages/inspect";
+import Workspace from "@/pages/workspace";
+import Results from "@/pages/results";
 import NotFound from "@/pages/not-found";
 
 const queryClient = new QueryClient();
 
-function Home() {
-  return (
-    <div className="min-h-screen w-full flex items-center justify-center bg-gray-50">
-      <div className="text-center">
-        <h1 className="text-2xl font-bold text-gray-900">Replit Agent is building...</h1>
-        <p className="mt-2 text-sm text-gray-600">Your app will appear here once it's ready.</p>
-      </div>
-    </div>
-  );
-}
-
 function Router() {
   return (
-    <Switch>
-      <Route path="/" component={Home} />
-      <Route component={NotFound} />
-    </Switch>
+    <Shell>
+      <Switch>
+        <Route path="/" component={Home} />
+        <Route path="/inspect" component={Inspect} />
+        <Route path="/workspace" component={Workspace} />
+        <Route path="/results" component={Results} />
+        <Route component={NotFound} />
+      </Switch>
+    </Shell>
   );
 }
 

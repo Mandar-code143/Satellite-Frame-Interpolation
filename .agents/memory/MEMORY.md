@@ -1,0 +1,2 @@
+- [Python FastAPI on api-server artifact](python-fastapi-setup.md) — artifact runs uvicorn directly via artifact.toml dev run; Python libs in .pythonlibs/
+- [WebGL unavailable in Replit preview](webgl-fallback.md) — use Canvas 2D or CSS for visuals; Three.js/R3F WebGL fails in the iframe sandbox

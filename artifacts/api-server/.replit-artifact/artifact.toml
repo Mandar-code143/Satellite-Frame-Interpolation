@@ -10,7 +10,7 @@ name = "API Server"
 paths = ["/api"]
 
 [services.development]
-run = "pnpm --filter @workspace/api-server run dev"
+run = "bash -c 'cd /home/runner/workspace && /home/runner/workspace/.pythonlibs/bin/uvicorn backend.app.main:app --host 0.0.0.0 --port ${PORT:-8080} --reload --reload-dir backend'"
 
 [services.production]
 
@@ -21,7 +21,6 @@ args = ["pnpm", "--filter", "@workspace/api-server", "run", "build"]
 NODE_ENV = "production"
 
 [services.production.run]
-# we don't run through pnpm to make startup faster in production
 args = ["node", "--enable-source-maps", "artifacts/api-server/dist/index.mjs"]
 
 [services.production.run.env]
