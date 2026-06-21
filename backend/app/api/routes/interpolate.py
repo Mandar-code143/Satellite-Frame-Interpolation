@@ -95,7 +95,7 @@ async def interpolate_frames(
 
         from PIL import Image
         interp_path = output_dir / "interpolated.png"
-        Image.fromarray(interpolated_arr, "L").save(str(interp_path))
+        Image.fromarray(interpolated_arr).save(str(interp_path))
 
         elapsed_ms = int((time.time() - start_time) * 1000)
 
@@ -109,7 +109,7 @@ async def interpolate_frames(
             dataset_notes=["Demo synthetic data" if is_demo else "Real NetCDF data"],
         )
 
-        base_url = f"/api/outputs/{job_id}"
+        base_url = f"http://127.0.0.1:8000/api/outputs/{job_id}"
         return JobResult(
             jobId=job_id,
             status="completed",

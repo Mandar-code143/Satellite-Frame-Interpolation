@@ -32,9 +32,9 @@ export default function Inspect() {
       const formData = new FormData();
       if (file) formData.append('file', file);
 
-      const res = await fetch('/api/inspect', {
-        method: 'POST',
-        body: formData,
+      const res = await fetch('http://127.0.0.1:8000/api/inspect', {
+      method: 'POST',
+      body: formData,
       });
 
       if (!res.ok) {

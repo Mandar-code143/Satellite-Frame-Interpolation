@@ -8,7 +8,7 @@ interface Store {
   currentJobId: string | null;
   datasetMetadata: DatasetMetadata | null;
   selectedVariable: string | null;
-  jobResult: JobResult | null;
+  jobResult: JobResult | null;    
   file: File | null;
   setMissionState: (state: MissionState) => void;
   setCurrentJobId: (id: string | null) => void;

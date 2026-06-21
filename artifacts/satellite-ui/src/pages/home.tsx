@@ -101,7 +101,7 @@ export default function Home() {
               <Activity className="h-3 w-3" /> COMPUTE NODE
             </div>
             <div className="text-sm font-semibold text-white">
-              {modelStatus?.device.toUpperCase() || 'UNKNOWN'}
+              {modelStatus?.device?.toUpperCase() || 'UNKNOWN'}
             </div>
           </div>
           <div className="space-y-1">

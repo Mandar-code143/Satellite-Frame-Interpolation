@@ -31,7 +31,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
           {health ? (
             <div className="flex items-center gap-2 text-xs font-mono text-muted-foreground bg-white/5 px-3 py-1.5 rounded-full border border-white/10">
               <span className={`h-2 w-2 rounded-full ${health.status === 'ok' ? 'bg-green-500 shadow-[0_0_8px_rgba(16,185,129,0.6)] animate-pulse' : 'bg-red-500'}`} />
-              SYS {health.status.toUpperCase()}
+              SYS {health?.status?.toUpperCase() || "UNKNOWN"}
               <span className="opacity-50 mx-1">|</span>
               V{health.version}
             </div>

@@ -15,8 +15,9 @@ for d in [UPLOADS_DIR, PREVIEWS_DIR, OUTPUTS_DIR, MODELS_DIR]:
 
 # Model config
 # Place your RIFE-family checkpoint at: backend/models/rife_checkpoint.pth
-MODEL_PATH = MODELS_DIR / "rife_checkpoint.pth"
-MODEL_FALLBACK_PATH = MODELS_DIR / "rife_v4.pth"
+# RIFE HD v3.6 model
+MODEL_PATH = MODELS_DIR / "rife" / "flownet.pkl"
+MODEL_FALLBACK_PATH = MODELS_DIR / "rife" / "flownet.pkl"
 
 APP_VERSION = "1.0.0"
 MAX_UPLOAD_BYTES = 500 * 1024 * 1024  # 500 MB

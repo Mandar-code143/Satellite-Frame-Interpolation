@@ -95,31 +95,19 @@ def _fallback_interpolate(
 
 
 def _load_real_model(model_path: Path, device: str):
-    """
-    Load RIFE-family checkpoint.
+    try:
+        from backend.models.rife.RIFE_HDv3 import Model
 
-    This implementation uses a generic PyTorch checkpoint loader.
-    For a real RIFE model, replace this with the appropriate model class
-    initialization and weight loading logic:
+        model = Model()
+        model.load_model("backend/models/rife", rank=-1)
+        model.eval()
 
-        from rife_model import IFNet  # your RIFE model class
-        model = IFNet()
-        checkpoint = torch.load(model_path, map_location=device)
-        model.load_state_dict(checkpoint['model'] if 'model' in checkpoint else checkpoint)
-        model.to(device).eval()
+        logger.info("RIFE HD v3 model loaded successfully")
+
         return model
 
-    The RIFE v4.x checkpoint expects a 5-channel input:
-      [frame_a (3ch), frame_b (3ch), timestep scalar] → interpolated_frame (3ch)
-    """
-    import torch
-    logger.info(f"Attempting to load model from {model_path} on {device}")
-    try:
-        checkpoint = torch.load(str(model_path), map_location=device)
-        logger.info("Checkpoint loaded successfully (generic loader)")
-        return checkpoint
     except Exception as e:
-        logger.error(f"Failed to load checkpoint: {e}")
+        logger.error(f"Failed to load RIFE model: {e}")
         return None
 
 
@@ -129,22 +117,57 @@ def _run_real_inference(
     frame_b: np.ndarray,
     device: str,
 ) -> np.ndarray:
-    """
-    Run RIFE inference.
 
-    Replace the body of this function with your RIFE model's forward pass:
+    import torch
+    import cv2
 
-        import torch
-        # Convert frames to tensors [1, C, H, W] in [0,1]
-        ta = torch.from_numpy(frame_a).float().unsqueeze(0).unsqueeze(0) / 255.0
-        tb = torch.from_numpy(frame_b).float().unsqueeze(0).unsqueeze(0) / 255.0
-        with torch.no_grad():
-            output = model(torch.cat([ta, tb], dim=1).to(device), timestep=0.5)
-        result = (output[0, 0].cpu().numpy() * 255).clip(0, 255).astype(np.uint8)
-        return result
-    """
-    logger.warning("Real inference not implemented — using fallback blend")
-    return _fallback_interpolate(frame_a, frame_b)
+    logger.info("Running REAL RIFE inference")
+
+    # Convert BGR → RGB
+    frame_a = cv2.cvtColor(frame_a, cv2.COLOR_BGR2RGB)
+    frame_b = cv2.cvtColor(frame_b, cv2.COLOR_BGR2RGB)
+
+    # Convert to tensor
+    img0 = (
+        torch.from_numpy(frame_a)
+        .permute(2, 0, 1)
+        .float()
+        .unsqueeze(0)
+        / 255.0
+    )
+
+    img1 = (
+        torch.from_numpy(frame_b)
+        .permute(2, 0, 1)
+        .float()
+        .unsqueeze(0)
+        / 255.0
+    )
+
+    img0 = img0.to(device)
+    img1 = img1.to(device)
+
+    with torch.no_grad():
+        output = model.inference(img0, img1)
+
+    output = (
+        output[0]
+        .permute(1, 2, 0)
+        .cpu()
+        .numpy()
+    )
+
+    output = (output * 255.0).clip(0, 255).astype(np.uint8)
+
+    output = cv2.cvtColor(output, cv2.COLOR_RGB2BGR)
+    
+    print("Input A mean:", frame_a.mean())
+    print("Input B mean:", frame_b.mean())
+    print("Output mean:", output.mean())
+
+    logger.info("REAL RIFE inference completed")
+
+    return output
 
 
 def run_interpolation(
@@ -160,8 +183,8 @@ def run_interpolation(
     from backend.app.core.config import MODEL_PATH, MODEL_FALLBACK_PATH
 
     # Load source frames
-    a = cv2.imread(str(frame_a_path), cv2.IMREAD_GRAYSCALE)
-    b = cv2.imread(str(frame_b_path), cv2.IMREAD_GRAYSCALE)
+    a = cv2.imread(str(frame_a_path), cv2.IMREAD_COLOR)
+    b = cv2.imread(str(frame_b_path), cv2.IMREAD_COLOR)
 
     if a is None or b is None:
         raise ValueError("Could not load source frames for interpolation")

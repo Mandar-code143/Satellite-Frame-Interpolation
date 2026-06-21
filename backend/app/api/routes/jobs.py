@@ -87,7 +87,7 @@ def _run_interpolation_job(job_id: str, file_path_str: str, selected_variable: s
         metrics_data = {"groundTruthAvailable": False}
 
         # Build result
-        base_url = f"/api/outputs/{job_id}"
+        base_url = f"http://127.0.0.1:8000/api/outputs/{job_id}"
         explanation = build_explanation(
             selected_variable=selected_var,
             detected_dims=detected_dims,
@@ -98,6 +98,8 @@ def _run_interpolation_job(job_id: str, file_path_str: str, selected_variable: s
             dataset_notes=["Demo synthetic data" if demo_mode else "Real NetCDF data processed"],
         )
 
+        print("ACTIVE JOBS.PY HIT")
+        print(base_url)
         result = {
             "jobId": job_id,
             "status": "completed",
