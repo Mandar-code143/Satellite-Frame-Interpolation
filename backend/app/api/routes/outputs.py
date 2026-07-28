@@ -2,7 +2,7 @@ from pathlib import Path
 from fastapi import APIRouter, HTTPException
 from fastapi.responses import FileResponse
 
-from backend.app.core.config import OUTPUTS_DIR
+from app.core.config import OUTPUTS_DIR
 
 router = APIRouter()
 

@@ -1,9 +1,9 @@
 from fastapi import APIRouter
 from datetime import datetime, timezone
 
-from backend.app.schemas.health import HealthStatus, ModelStatus
-from backend.app.services.model_adapter import get_model_status
-from backend.app.core.config import APP_VERSION
+from app.schemas.health import HealthStatus, ModelStatus
+from app.services.model_adapter import get_model_status
+from app.core.config import APP_VERSION
 
 router = APIRouter()
 

@@ -10,10 +10,10 @@ from pathlib import Path
 from fastapi import APIRouter, UploadFile, File, Form, HTTPException
 from typing import Optional
 
-from backend.app.core.config import UPLOADS_DIR, OUTPUTS_DIR, MAX_UPLOAD_BYTES, ALLOWED_EXTENSIONS
-from backend.app.schemas.job import JobResult
-from backend.app.services import job_manager, preprocessing, model_adapter
-from backend.app.services.job_manager import build_explanation
+from app.core.config import UPLOADS_DIR, OUTPUTS_DIR, MAX_UPLOAD_BYTES, ALLOWED_EXTENSIONS
+from app.schemas.job import JobResult
+from app.services import job_manager, preprocessing, model_adapter
+from app.services.job_manager import build_explanation
 
 router = APIRouter()
 logger = logging.getLogger(__name__)

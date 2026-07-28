@@ -7,7 +7,7 @@ sys.path.insert(0, str(ROOT))
 import xarray as xr
 import numpy as np
 
-from backend.app.services.preprocessing import (
+from app.services.preprocessing import (
     normalize_to_uint8,
     resize_frame,
     compute_metrics

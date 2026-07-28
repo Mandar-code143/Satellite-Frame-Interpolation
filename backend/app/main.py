@@ -6,7 +6,7 @@ import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from backend.app.api.routes import health, inspect, jobs, interpolate, outputs
+from app.api.routes import health, inspect, jobs, interpolate, outputs
 
 logging.basicConfig(
     level=logging.INFO,
@@ -39,7 +39,7 @@ app.include_router(outputs.router, prefix="/api", tags=["outputs"])
 
 @app.on_event("startup")
 async def startup_event():
-    from backend.app.core.config import UPLOADS_DIR, PREVIEWS_DIR, OUTPUTS_DIR, MODELS_DIR
+    from app.core.config import UPLOADS_DIR, PREVIEWS_DIR, OUTPUTS_DIR, MODELS_DIR
     for d in [UPLOADS_DIR, PREVIEWS_DIR, OUTPUTS_DIR, MODELS_DIR]:
         d.mkdir(parents=True, exist_ok=True)
     logger.info("ISRO Satellite Frame Interpolation backend started")

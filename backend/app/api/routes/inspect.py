@@ -4,10 +4,10 @@ import aiofiles
 from pathlib import Path
 from fastapi import APIRouter, UploadFile, File, HTTPException
 
-from backend.app.core.config import UPLOADS_DIR, MAX_UPLOAD_BYTES, ALLOWED_EXTENSIONS
-from backend.app.services.netcdf_service import inspect_netcdf
-from backend.app.schemas.dataset import DatasetMetadata
-from backend.app.schemas.job import ErrorResponse
+from app.core.config import UPLOADS_DIR, MAX_UPLOAD_BYTES, ALLOWED_EXTENSIONS
+from app.services.netcdf_service import inspect_netcdf
+from app.schemas.dataset import DatasetMetadata
+from app.schemas.job import ErrorResponse
 
 router = APIRouter()
 logger = logging.getLogger(__name__)

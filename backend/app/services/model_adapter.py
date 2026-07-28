@@ -46,7 +46,7 @@ def _model_exists(model_path: Path) -> bool:
 
 
 def get_model_status() -> dict:
-    from backend.app.core.config import MODEL_PATH, MODEL_FALLBACK_PATH
+    from app.core.config import MODEL_PATH, MODEL_FALLBACK_PATH
 
     device = _detect_device()
     torch_version = _get_torch_version()
@@ -180,7 +180,7 @@ def run_interpolation(
     Returns: (interpolated_frame_uint8, is_fallback, mode_label)
     """
     import cv2
-    from backend.app.core.config import MODEL_PATH, MODEL_FALLBACK_PATH
+    from app.core.config import MODEL_PATH, MODEL_FALLBACK_PATH
 
     # Load source frames
     a = cv2.imread(str(frame_a_path), cv2.IMREAD_COLOR)

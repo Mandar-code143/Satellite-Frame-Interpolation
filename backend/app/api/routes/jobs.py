@@ -2,9 +2,9 @@ import logging
 from datetime import datetime, timezone
 from fastapi import APIRouter, HTTPException
 
-from backend.app.schemas.job import JobCreated, JobStatus, JobResult, JobInput, ErrorResponse
-from backend.app.services import job_manager
-from backend.app.core.config import UPLOADS_DIR, OUTPUTS_DIR
+from app.schemas.job import JobCreated, JobStatus, JobResult, JobInput, ErrorResponse
+from app.services import job_manager
+from app.core.config import UPLOADS_DIR, OUTPUTS_DIR
 
 router = APIRouter()
 logger = logging.getLogger(__name__)
@@ -15,11 +15,11 @@ def _run_interpolation_job(job_id: str, file_path_str: str, selected_variable: s
     """Full interpolation pipeline run in a background thread."""
     import xarray as xr
     from pathlib import Path
-    from backend.app.services import preprocessing, model_adapter
-    from backend.app.services.job_manager import (
+    from app.services import preprocessing, model_adapter
+    from app.services.job_manager import (
         update_job, complete_job, fail_job, build_explanation
     )
-    from backend.app.schemas.job import JobStage, ValidationMetrics
+    from app.schemas.job import JobStage, ValidationMetrics
 
     output_dir = OUTPUTS_DIR / job_id
     output_dir.mkdir(parents=True, exist_ok=True)

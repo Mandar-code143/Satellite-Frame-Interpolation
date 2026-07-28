@@ -10,7 +10,7 @@ from datetime import datetime, timezone
 from typing import Optional, Dict, Callable
 from pathlib import Path
 
-from backend.app.schemas.job import (
+from app.schemas.job import (
     JobStatus, JobResult, JobStage, ExplanationStep,
     Explanation, ValidationMetrics
 )
