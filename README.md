@@ -122,7 +122,7 @@ python -m uvicorn backend.app.main:app --reload
 Backend runs on:
 
 ```text
-http://127.0.0.1:8000
+https://isro-backend-production.up.railway.app
 ```
 
 ### Frontend Setup

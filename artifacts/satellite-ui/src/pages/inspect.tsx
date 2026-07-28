@@ -32,7 +32,7 @@ export default function Inspect() {
       const formData = new FormData();
       if (file) formData.append('file', file);
 
-      const res = await fetch('http://127.0.0.1:8000/api/inspect', {
+      const res = await fetch('https://isro-backend-production.up.railway.app/api/inspect', {
       method: 'POST',
       body: formData,
       });

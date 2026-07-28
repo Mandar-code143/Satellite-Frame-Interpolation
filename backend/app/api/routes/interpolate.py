@@ -109,7 +109,7 @@ async def interpolate_frames(
             dataset_notes=["Demo synthetic data" if is_demo else "Real NetCDF data"],
         )
 
-        base_url = f"http://127.0.0.1:8000/api/outputs/{job_id}"
+        base_url = f"https://isro-backend-production.up.railway.app/api/outputs/{job_id}"
         return JobResult(
             jobId=job_id,
             status="completed",

@@ -60,7 +60,7 @@ export default function Workspace() {
           addLog(`Target variable locked: ${selectedVariable}`, 'info');
         }
 
-        const res = await fetch('http://127.0.0.1:8000/api/interpolate', {
+        const res = await fetch('https://isro-backend-production.up.railway.app/api/interpolate', {
         method: 'POST',
         body: formData,
         });
@@ -117,7 +117,7 @@ export default function Workspace() {
        if (jobStatus.status === 'completed') {
          addLog('Job completed successfully. Fetching results...', 'info');
          // We need to fetch the actual result now
-         fetch(`http://127.0.0.1:8000/api/jobs/${currentJobId}/result`)
+         fetch(`https://isro-backend-production.up.railway.app/api/jobs/${currentJobId}/result`)
            .then(res => res.json())
            .then(data => {
              setJobResult(data);
